@@ -137,10 +137,21 @@ export function PromptTool() {
         body: JSON.stringify(request)
       });
       const contentType = response.headers.get("Content-Type") ?? "";
-      if (!response.ok || !contentType.includes("application/json")) {
-        throw new Error("The AI endpoint is not available in this preview.");
+      const data = contentType.includes("application/json")
+        ? ((await response.json()) as GeneratePromptResponse)
+        : undefined;
+      if (!response.ok) {
+        if (data && !data.ok) {
+          throw new Error(data.message);
+        }
+        if (response.status === 429) {
+          throw new Error("The free AI prompt limit has been reached. Try again later.");
+        }
+        throw new Error("The AI endpoint is unavailable right now.");
       }
-      const data = (await response.json()) as GeneratePromptResponse;
+      if (!data) {
+        throw new Error("The AI endpoint returned an unreadable response.");
+      }
       if (!data.ok) {
         throw new Error(data.message);
       }

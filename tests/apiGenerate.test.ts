@@ -171,4 +171,67 @@ describe("OpenAI response integration", () => {
     });
     expect(text).toBe("{\"title\":\"Nested\"}");
   });
+
+  it("replaces leaked model self-correction in practice steps", async () => {
+    const fetcher = vi.fn(async (url: string) => {
+      if (url.startsWith("https://redis.example")) {
+        return new Response(JSON.stringify({ result: 1 }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+      return new Response(
+        JSON.stringify({
+          output_text: JSON.stringify({
+            title: "Moon Mechanic",
+            drawingPrompt: "Draw an original moon mechanic repairing a clock.",
+            structured: {
+              subject: "an original moon mechanic",
+              action: "repairing a clock",
+              setting: "a quiet workbench",
+              medium: "graphite sketch",
+              mood: "curious",
+              palette: "limited warm and cool accents",
+              composition: "clear focal point",
+              constraint: "include one unexpected texture",
+              difficulty: "easy",
+              timeLimit: "20 min",
+              audience: "general",
+              genre: "AI image prompt"
+            },
+            practiceSteps: [
+              "Block the focal point.",
+              "Add the shy pose. Wait malformed? Need fix.",
+              "Add the palette."
+            ],
+            aiImagePrompt: "original moon mechanic, graphite",
+            negativePrompt: "no logos",
+            teacherNote: ""
+          })
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    });
+
+    const response = await generatePromptResponse({
+      body: { ...baseRequest, sessionId: "meta-comment" },
+      headers: { ...headers, "x-forwarded-for": "203.0.113.44" },
+      deps: {
+        env: {
+          OPENAI_API_KEY: "test-key",
+          UPSTASH_REDIS_REST_URL: "https://redis.example",
+          UPSTASH_REDIS_REST_TOKEN: "redis-test-token"
+        },
+        fetcher: fetcher as unknown as typeof fetch
+      }
+    });
+
+    expect(response.ok).toBe(true);
+    if (response.ok) {
+      expect(response.result.practiceSteps).not.toEqual(expect.arrayContaining([expect.stringMatching(/malformed|need fix/i)]));
+      expect(response.result.practiceSteps).toContain(
+        "Review the silhouette, focal point, and chosen constraint before adding final details."
+      );
+    }
+  });
 });

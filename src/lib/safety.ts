@@ -17,6 +17,7 @@ const livingArtistStylePattern =
   /\b(?:in the style of|draw like|copy the style of|as painted by)\s+[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?/;
 
 const kidUnsafeMoods = /\b(?:horror|terrifying|nightmare|grim|violent|bloody)\b/i;
+const modelMetaComment = /\b(?:wait[,\s]+malformed|need(?:s)?\s+(?:a\s+)?fix(?:ing)?|editor(?:'s)?\s+note|model\s+note)\b/i;
 
 export interface SafetyCheck {
   ok: boolean;
@@ -86,7 +87,7 @@ export const enforceResultSafety = (result: PromptResult): PromptResult => {
     title: scrubUnsafeText(result.title),
     drawingPrompt: scrubUnsafeText(result.drawingPrompt),
     structured,
-    practiceSteps: result.practiceSteps.map(scrubUnsafeText).filter(Boolean).slice(0, 4),
+    practiceSteps: result.practiceSteps.map(scrubPracticeStep).filter(Boolean).slice(0, 4),
     aiImagePrompt: result.aiImagePrompt ? scrubUnsafeText(result.aiImagePrompt) : undefined,
     negativePrompt: result.negativePrompt ? scrubUnsafeText(result.negativePrompt) : undefined,
     teacherNote: result.teacherNote ? scrubUnsafeText(result.teacherNote) : undefined,
@@ -94,6 +95,11 @@ export const enforceResultSafety = (result: PromptResult): PromptResult => {
       "Generated prompts avoid NSFW, graphic violence, protected characters, brand logos, and living-artist style requests."
   };
 };
+
+const scrubPracticeStep = (value: string): string =>
+  modelMetaComment.test(value)
+    ? "Review the silhouette, focal point, and chosen constraint before adding final details."
+    : scrubUnsafeText(value);
 
 export const containsForbiddenTerm = (text: string): boolean =>
   [...unsafePatterns, ...protectedIpPatterns, livingArtistStylePattern].some((pattern) => pattern.test(text));

@@ -91,4 +91,25 @@ describe("PromptTool integration", () => {
     await user.click(screen.getByRole("button", { name: "Copy prompt" }));
     expect(screen.getByText(/Copy failed/i)).toBeInTheDocument();
   });
+
+  it("explains an edge rate limit and falls back to a local draft", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response("Too many requests", {
+          status: 429,
+          headers: { "Content-Type": "text/plain" }
+        })
+      )
+    );
+
+    render(<App path="/" />);
+    await user.clear(screen.getByLabelText("Rough idea"));
+    await user.type(screen.getByLabelText("Rough idea"), "a clockmaker training fireflies");
+    await user.click(screen.getByRole("button", { name: "Generate prompt" }));
+
+    expect(await screen.findByText(/free AI prompt limit has been reached/i)).toBeInTheDocument();
+    expect(screen.getByText("Local draft")).toBeInTheDocument();
+  });
 });
