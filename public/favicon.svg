@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>Drawing Prompt Generator</title>
+  <rect width="64" height="64" rx="12" fill="#f5d76e"/>
+  <path d="M15 45l5-17 16-16 9 9-16 16-14 8z" fill="#ffffff" stroke="#202226" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M35 13l9 9" stroke="#202226" stroke-width="3" stroke-linecap="round"/>
+  <path d="M20 28l9 9" stroke="#0f766e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M15 45l10-3-7-7-3 10z" fill="#c85a3f" stroke="#202226" stroke-width="3" stroke-linejoin="round"/>
+</svg>

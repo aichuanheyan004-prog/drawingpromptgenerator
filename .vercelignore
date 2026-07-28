@@ -1,0 +1,7 @@
+docs/
+tests/
+coverage/
+test-results/
+playwright-report/
+dist-ssr/
+*.log

@@ -1,0 +1,39 @@
+{
+  "name": "drawingpromptgenerator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run --root . --config vitest.config.mjs",
+    "test:unit": "vitest run --root . --config vitest.config.mjs tests/promptGenerator.test.ts tests/apiGenerate.test.ts tests/storage.test.ts",
+    "test:integration": "vitest run --root . --config vitest.config.mjs tests/app.integration.test.tsx",
+    "test:e2e": "node tests/e2e-routes.mjs",
+    "audit:static": "node C:/Users/chunk/.codex/skills/gefei-site-builder/scripts/audit_static_site.mjs dist"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^22.16.5",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.38.0",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
+  }
+}
