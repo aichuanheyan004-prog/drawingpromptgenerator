@@ -97,9 +97,9 @@ describe("PromptTool integration", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async () =>
-        new Response("Too many requests", {
+        new Response(JSON.stringify({ error: { code: "429", message: "Too Many Requests" } }), {
           status: 429,
-          headers: { "Content-Type": "text/plain" }
+          headers: { "Content-Type": "application/json" }
         })
       )
     );

@@ -75,6 +75,12 @@ const selectOptions = {
   ]
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const isGeneratePromptResponse = (value: unknown): value is GeneratePromptResponse =>
+  isRecord(value) && typeof value.ok === "boolean";
+
 export function PromptTool() {
   const [idea, setIdea] = useState(initialIdea);
   const [controls, setControls] = useState<PromptControls>({ ...defaultControls, mode: "ai-image" });
@@ -129,7 +135,7 @@ export function PromptTool() {
     setMessage("Refining your idea...");
 
     try {
-      const response = await fetch("/api/generate", {
+      const response = await fetch("/api/generate/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -138,18 +144,18 @@ export function PromptTool() {
       });
       const contentType = response.headers.get("Content-Type") ?? "";
       const data = contentType.includes("application/json")
-        ? ((await response.json()) as GeneratePromptResponse)
+        ? ((await response.json()) as unknown)
         : undefined;
       if (!response.ok) {
-        if (data && !data.ok) {
-          throw new Error(data.message);
-        }
         if (response.status === 429) {
           throw new Error("The free AI prompt limit has been reached. Try again later.");
         }
+        if (isGeneratePromptResponse(data) && !data.ok) {
+          throw new Error(data.message);
+        }
         throw new Error("The AI endpoint is unavailable right now.");
       }
-      if (!data) {
+      if (!isGeneratePromptResponse(data)) {
         throw new Error("The AI endpoint returned an unreadable response.");
       }
       if (!data.ok) {
