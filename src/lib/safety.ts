@@ -118,6 +118,7 @@ const scrubUnsafeText = (value: string): string =>
     .replace(unsafePatterns[2], "reflective")
     .replace(unsafePatterns[3], "high-stakes fictional")
     .replace(unsafePatterns[4], "historical cautionary")
+    .replace(/\s+[\u0400-\u04ff][?!.]*$/u, "")
     .replace(/\s+/g, " ")
     .trim();
 
