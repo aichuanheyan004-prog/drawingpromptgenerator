@@ -61,8 +61,9 @@ describe("PromptTool integration", () => {
     await user.click(screen.getByRole("button", { name: "Subject" }));
     expect(screen.getByText("1 locked fields")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Copy prompt" }));
-    expect(writeText).toHaveBeenCalledWith(expect.stringContaining("Robot Gardener Drawing Prompt"));
+    await user.click(screen.getByRole("button", { name: "Copy final AI image prompt" }));
+    expect(writeText).toHaveBeenCalledWith("original robot gardener, watercolor, no logos\n\nNegative prompt: no logos");
+    expect(screen.getByText("Final AI image prompt copied.")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Save favorite" }));
     expect(screen.getAllByText("Robot Gardener Drawing Prompt").length).toBeGreaterThan(1);
@@ -88,7 +89,7 @@ describe("PromptTool integration", () => {
       })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Copy prompt" }));
+    await user.click(screen.getByRole("button", { name: "Copy final AI image prompt" }));
     expect(screen.getByText(/Copy failed/i)).toBeInTheDocument();
   });
 

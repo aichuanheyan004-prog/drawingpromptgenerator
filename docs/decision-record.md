@@ -2,6 +2,10 @@
 
 Date checked: July 28, 2026
 
+## Product Change - July 29, 2026
+
+The default copy action now copies only the final output for the displayed mode. AI image results copy the positive AI image prompt followed by the labeled negative prompt; other modes copy only the final drawing prompt. The full title, drawing brief, structured fields, and practice steps remain visible but are no longer included in the default clipboard text. This removes ambiguity and prevents users from pasting internal practice metadata into an image model.
+
 ## Target Task
 
 Artists, hobbyists, students, teachers, writers, character designers, game designers, and AI image users in the United States need to turn a vague drawing idea into a specific, safe, usable drawing prompt or AI image prompt.

@@ -68,27 +68,13 @@ export const buildStructuredPrompt = (
 };
 
 export const formatPromptForCopy = (result: PromptResult): string => {
-  const parts = [
-    result.title,
-    "",
-    result.drawingPrompt,
-    "",
-    `Medium: ${result.structured.medium}`,
-    `Mood: ${result.structured.mood}`,
-    `Palette: ${result.structured.palette}`,
-    `Composition: ${result.structured.composition}`,
-    `Constraint: ${result.structured.constraint}`,
-    `Difficulty: ${result.structured.difficulty}`,
-    `Time limit: ${result.structured.timeLimit}`,
-    result.aiImagePrompt ? "" : undefined,
-    result.aiImagePrompt ? `AI image prompt: ${result.aiImagePrompt}` : undefined,
-    result.negativePrompt ? `Negative prompt: ${result.negativePrompt}` : undefined,
-    "",
-    "Practice steps:",
-    ...result.practiceSteps.map((step, index) => `${index + 1}. ${step}`)
-  ].filter((part): part is string => typeof part === "string");
+  if (!result.aiImagePrompt) {
+    return result.drawingPrompt;
+  }
 
-  return parts.join("\n");
+  return [result.aiImagePrompt, result.negativePrompt ? `Negative prompt: ${result.negativePrompt}` : undefined]
+    .filter((part): part is string => typeof part === "string")
+    .join("\n\n");
 };
 
 export const exampleRequest = (controls: PromptControls, random: RandomSource = new SeededRandom("example")): string => {

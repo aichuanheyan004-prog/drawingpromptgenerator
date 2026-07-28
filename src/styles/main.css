@@ -342,17 +342,46 @@ select {
   line-height: 1.62;
 }
 
+.result-block {
+  display: grid;
+  gap: 8px;
+}
+
+.result-block h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
 .ai-box {
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   padding: 12px 0;
 }
 
+.ai-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ai-box-header .icon-action {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+}
+
 .ai-box h3,
 .steps h3,
 .saved-list h3 {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 0.98rem;
+}
+
+.steps h3,
+.saved-list h3 {
+  margin-bottom: 8px;
 }
 
 .ai-box p {

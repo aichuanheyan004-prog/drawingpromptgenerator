@@ -182,12 +182,12 @@ export function PromptTool() {
     receiveResult(local, "Regenerated locally with your locked fields.");
   };
 
-  const copyPrompt = async () => {
+  const copyFinalPrompt = async () => {
     const text = formatPromptForCopy(result);
     try {
       await navigator.clipboard.writeText(text);
       setStatus("copied");
-      setMessage("Prompt copied.");
+      setMessage(result.aiImagePrompt ? "Final AI image prompt copied." : "Drawing prompt copied.");
     } catch {
       setStatus("error");
       setMessage("Copy failed. Select the prompt text and copy it manually.");
@@ -309,20 +309,42 @@ export function PromptTool() {
               <h2>{result.title}</h2>
             </div>
             <div className="button-row compact">
-              <button className="icon-action" type="button" onClick={copyPrompt} title="Copy prompt" aria-label="Copy prompt">
-                <Clipboard aria-hidden="true" size={18} />
-              </button>
+              {!result.aiImagePrompt ? (
+                <button
+                  className="icon-action"
+                  type="button"
+                  onClick={copyFinalPrompt}
+                  title="Copy drawing prompt"
+                  aria-label="Copy drawing prompt"
+                >
+                  <Clipboard aria-hidden="true" size={18} />
+                </button>
+              ) : null}
               <button className="icon-action" type="button" onClick={saveFavorite} title="Save favorite" aria-label="Save favorite">
                 <Save aria-hidden="true" size={18} />
               </button>
             </div>
           </div>
 
-          <p className="prompt-output">{result.drawingPrompt}</p>
+          <div className="result-block">
+            <h3>{result.aiImagePrompt ? "Drawing brief" : "Final drawing prompt"}</h3>
+            <p className="prompt-output">{result.drawingPrompt}</p>
+          </div>
 
           {result.aiImagePrompt ? (
             <div className="ai-box">
-              <h3>AI image prompt text</h3>
+              <div className="ai-box-header">
+                <h3>Final AI image prompt</h3>
+                <button
+                  className="icon-action"
+                  type="button"
+                  onClick={copyFinalPrompt}
+                  title="Copy final AI image prompt"
+                  aria-label="Copy final AI image prompt"
+                >
+                  <Clipboard aria-hidden="true" size={18} />
+                </button>
+              </div>
               <p>{result.aiImagePrompt}</p>
               {result.negativePrompt ? <p className="negative">Negative: {result.negativePrompt}</p> : null}
             </div>

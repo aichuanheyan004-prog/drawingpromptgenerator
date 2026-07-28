@@ -67,14 +67,23 @@ describe("local prompt generator", () => {
     expect(checkRequestSafety(request({ idea: "a peaceful library at dusk" })).ok).toBe(true);
   });
 
-  it("formats copy text with actual prompt content and steps", () => {
+  it("formats a clean final AI prompt for copying", () => {
     const result = createLocalPrompt({ request: request(), seed: "copy" });
     const text = formatPromptForCopy(result);
 
-    expect(text).toContain(result.title);
-    expect(text).toContain(result.drawingPrompt);
-    expect(text).toContain("Practice steps:");
-    expect(text).toContain("1.");
+    expect(text).toBe(`${result.aiImagePrompt}\n\nNegative prompt: ${result.negativePrompt}`);
+    expect(text).not.toContain(result.title);
+    expect(text).not.toContain(result.drawingPrompt);
+    expect(text).not.toContain("Practice steps:");
+  });
+
+  it("copies only the final drawing prompt outside AI image mode", () => {
+    const result = createLocalPrompt({
+      request: request({ controls: { ...defaultControls, mode: "beginner" } }),
+      seed: "drawing-copy"
+    });
+
+    expect(formatPromptForCopy(result)).toBe(result.drawingPrompt);
   });
 
   it("handles long ideas, special characters, and empty pool errors", () => {
