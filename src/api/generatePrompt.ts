@@ -118,9 +118,12 @@ export const generatePromptResponse = async ({ body, headers, deps }: GenerateAr
   try {
     const result = await callOpenAi(request, key, deps);
     return { ok: true, result, remaining: rate.remaining };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "The AI model is unavailable right now.";
-    return { ok: false, code: "model_error", message };
+  } catch {
+    return {
+      ok: false,
+      code: "model_error",
+      message: "The AI model could not finish this prompt. Please try again."
+    };
   }
 };
 
@@ -194,7 +197,8 @@ export const callOpenAi = async (
                 requirements: [
                   "Make the drawing prompt specific enough to draw.",
                   "Keep locked fields unchanged when provided.",
-                  "Include practical practice steps.",
+                  "Keep the drawing prompt under 120 words and each practice step under 24 words.",
+                  "Include three or four concise practical practice steps.",
                   "If mode is ai-image, provide text prompt formatting only; do not claim to generate images.",
                   "If audience or mode is kids/classroom, keep it safe for children and teachers."
                 ]
@@ -211,7 +215,7 @@ export const callOpenAi = async (
           schema: responseSchema
         }
       },
-      max_output_tokens: 900,
+      max_output_tokens: 1400,
       safety_identifier: `dpg_${clientHash.slice(0, 32)}`
     })
   });

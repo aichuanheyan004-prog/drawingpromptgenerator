@@ -109,7 +109,7 @@ describe("OpenAI response integration", () => {
       const body = JSON.parse(String(init?.body));
       expect(body.model).toBe("test-model");
       expect(body.text.format.type).toBe("json_schema");
-      expect(body.max_output_tokens).toBe(900);
+      expect(body.max_output_tokens).toBe(1400);
       expect(body.safety_identifier).toContain("dpg_");
       return new Response(
         JSON.stringify({
@@ -170,6 +170,29 @@ describe("OpenAI response integration", () => {
       output: [{ content: [{ text: "{\"title\":\"Nested\"}" }] }]
     });
     expect(text).toBe("{\"title\":\"Nested\"}");
+  });
+
+  it("does not expose model parsing details to users", async () => {
+    const response = await generatePromptResponse({
+      body: { ...baseRequest, sessionId: "truncated-model-output" },
+      headers: { ...headers, "x-forwarded-for": "203.0.113.52" },
+      deps: {
+        env: { OPENAI_API_KEY: "test-key", VERCEL_FIREWALL_RATE_LIMIT: "true" },
+        fetcher: vi.fn(async () =>
+          new Response(JSON.stringify({ output_text: '{"title":"unfinished' }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" }
+          })
+        ) as unknown as typeof fetch
+      }
+    });
+
+    expect(response.ok).toBe(false);
+    if (!response.ok) {
+      expect(response.code).toBe("model_error");
+      expect(response.message).toBe("The AI model could not finish this prompt. Please try again.");
+      expect(response.message).not.toContain("JSON");
+    }
   });
 
   it("replaces leaked model self-correction in practice steps", async () => {
