@@ -1,4 +1,4 @@
-import { generatePromptResponse } from "../src/api/generatePrompt";
+import { generatePromptResponse } from "../src/api/generatePrompt.js";
 
 interface VercelLikeRequest {
   method?: string;

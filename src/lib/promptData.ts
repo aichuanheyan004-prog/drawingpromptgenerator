@@ -1,4 +1,4 @@
-import type { Audience, Difficulty, PromptMode } from "./types";
+import type { Audience, Difficulty, PromptMode } from "./types.js";
 
 interface PromptItem {
   value: string;

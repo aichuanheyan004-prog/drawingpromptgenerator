@@ -1,7 +1,7 @@
-import { actions, fallbackExamples, filterItems, settings, subjects } from "./promptData";
-import { pick, randomId, type RandomSource, SeededRandom } from "./prng";
-import { enforceResultSafety, normalizeControls, sanitizeIdea } from "./safety";
-import type { GeneratePromptRequest, LockedFields, PromptControls, PromptResult, StructuredPrompt } from "./types";
+import { actions, fallbackExamples, filterItems, settings, subjects } from "./promptData.js";
+import { pick, randomId, type RandomSource, SeededRandom } from "./prng.js";
+import { enforceResultSafety, normalizeControls, sanitizeIdea } from "./safety.js";
+import type { GeneratePromptRequest, LockedFields, PromptControls, PromptResult, StructuredPrompt } from "./types.js";
 
 export interface LocalPromptOptions {
   request: GeneratePromptRequest;

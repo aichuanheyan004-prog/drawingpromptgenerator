@@ -1,4 +1,4 @@
-import type { GeneratePromptRequest, PromptControls, PromptResult, StructuredPrompt } from "./types";
+import type { GeneratePromptRequest, PromptControls, PromptResult, StructuredPrompt } from "./types.js";
 
 const unsafePatterns = [
   /\b(?:porn|porno|sex|sexual|nude|nudity|fetish|erotic)\b/i,

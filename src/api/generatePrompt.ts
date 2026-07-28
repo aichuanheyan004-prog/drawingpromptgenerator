@@ -1,6 +1,6 @@
-import { createLocalPrompt } from "../lib/promptGenerator";
-import { checkRequestSafety, enforceResultSafety, normalizeControls, sanitizeIdea } from "../lib/safety";
-import type { GeneratePromptRequest, GeneratePromptResponse, LockedFields, PromptControls, PromptResult } from "../lib/types";
+import { createLocalPrompt } from "../lib/promptGenerator.js";
+import { checkRequestSafety, enforceResultSafety, normalizeControls, sanitizeIdea } from "../lib/safety.js";
+import type { GeneratePromptRequest, GeneratePromptResponse, LockedFields, PromptControls, PromptResult } from "../lib/types.js";
 
 interface RequestHeaders {
   [key: string]: string | string[] | undefined;
