@@ -109,7 +109,7 @@ export const generatePromptResponse = async ({ body, headers, deps }: GenerateAr
     };
   }
 
-  if (!deps.env.OPENAI_API_KEY) {
+  if (!deps.env.OPENAI_API_KEY || !hasDurableRateLimit(deps.env)) {
     const result = createLocalPrompt({ request, seed: `${key}:${request.idea}`, now: deps.now?.() ?? new Date() });
     return { ok: true, result, remaining: rate.remaining };
   }
@@ -297,6 +297,9 @@ const checkRateLimit = async (
   existing.count += 1;
   return { allowed: true, remaining: Math.max(0, limit - existing.count) };
 };
+
+const hasDurableRateLimit = (env: GenerateEnvironment): boolean =>
+  Boolean(env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN);
 
 const checkUpstashRateLimit = async (
   key: string,

@@ -52,9 +52,15 @@ V1 does not take payment and does not require login. The reason is not "zero cos
 - Output capped by API token limit.
 - Low-cost model configured by `OPENAI_MODEL`, defaulting to `gpt-5.6-luna` unless the deployment owner overrides it.
 - Anonymous IP/session rate limit.
-- Optional Upstash Redis durable limiter when configured.
-- OpenAI project hard spend limit must be set before public launch.
+- Durable Upstash Redis limiting is required before the server calls OpenAI; without it the API fails closed to the local generator.
+- A verified OpenAI project budget/usage cap must be set before public AI launch. Treat provider-side limits as a final backstop, not the primary abuse control.
 - No image generation, uploads, database, or saved server history.
+
+### Cost model checked July 28, 2026
+
+OpenAI's official standard pricing lists `gpt-5.6-luna` at `$1.00` per million input tokens and `$6.00` per million output tokens for short-context requests. With this endpoint's 900-output-token ceiling, a conservative request using 800 input tokens and the full 900 output tokens costs about `$0.0062`; a more typical 800-input/400-output request costs about `$0.0032`. At the conservative ceiling, 1,000 successful AI prompts are about `$6.20`, excluding taxes and regional-processing uplifts.
+
+Launch boundary: start with 12 successful AI requests per durable anonymous key per hour and an owner-selected monthly provider budget no higher than the amount the owner is comfortable losing in an abuse spike. Pause paid AI automatically by removing the Vercel key or Redis credentials if daily usage is abnormal, the budget reaches 80%, or durable limiting is unavailable. Do not rely on Vercel function memory for public cost control.
 
 Payment is postponed until measured usage shows one of these triggers:
 
@@ -77,7 +83,7 @@ Controls:
 - No account, cookies, analytics, or database in v1.
 - Favorites and recent history are localStorage-only.
 - API requests are transient; users are told not to enter personal or sensitive information.
-- Server-side limits reduce cost exposure. OpenAI spend hard limits and optional Redis limiter are launch checklist items.
+- Durable server-side limits reduce cost exposure. Provider budget alerts/limits and Redis credentials are launch checklist items.
 
 ## MVP Acceptance Criteria
 
@@ -118,7 +124,8 @@ Expand when GSC shows sustained impressions/clicks for distinct child intents an
   - https://developers.openai.com/api/docs/guides/text-generation
   - https://developers.openai.com/api/docs/guides/structured-outputs
   - https://developers.openai.com/api/docs/guides/safety-best-practices
-  - https://platform.openai.com/docs/pricing
+  - https://developers.openai.com/api/docs/pricing
+  - https://developers.openai.com/api/docs/guides/latest-model
 - OpenAI usage policies were checked for safety constraints on July 28, 2026: https://openai.com/policies/usage-policies/
 
 ## Open Assumptions

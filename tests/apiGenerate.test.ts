@@ -52,6 +52,25 @@ describe("API request validation", () => {
     }
   });
 
+  it("does not call the paid model without a durable rate limiter", async () => {
+    const fetcher = vi.fn();
+    const result = await generatePromptResponse({
+      body: { ...baseRequest, sessionId: "no-durable-limit" },
+      headers,
+      deps: {
+        env: { OPENAI_API_KEY: "test-key" },
+        fetcher: fetcher as unknown as typeof fetch,
+        now: () => new Date("2026-07-28T00:30:00.000Z")
+      }
+    });
+
+    expect(result.ok).toBe(true);
+    expect(fetcher).not.toHaveBeenCalled();
+    if (result.ok) {
+      expect(result.result.source).toBe("local");
+    }
+  });
+
   it("enforces anonymous hourly limits", async () => {
     const deps = { env: { FREE_REQUESTS_PER_HOUR: "1" }, now: () => new Date("2026-07-28T01:00:00.000Z") };
     const first = await generatePromptResponse({ body: { ...baseRequest, sessionId: "limited" }, headers, deps });
@@ -68,7 +87,13 @@ describe("API request validation", () => {
 
 describe("OpenAI response integration", () => {
   it("sends structured Responses API requests and normalizes AI output", async () => {
-    const fetcher = vi.fn(async (_url: string, init?: RequestInit) => {
+    const fetcher = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.startsWith("https://redis.example")) {
+        return new Response(JSON.stringify({ result: 1 }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
       const body = JSON.parse(String(init?.body));
       expect(body.model).toBe("test-model");
       expect(body.text.format.type).toBe("json_schema");
@@ -107,7 +132,12 @@ describe("OpenAI response integration", () => {
       body: baseRequest,
       headers: { ...headers, "x-forwarded-for": "203.0.113.12" },
       deps: {
-        env: { OPENAI_API_KEY: "test-key", OPENAI_MODEL: "test-model" },
+        env: {
+          OPENAI_API_KEY: "test-key",
+          OPENAI_MODEL: "test-model",
+          UPSTASH_REDIS_REST_URL: "https://redis.example",
+          UPSTASH_REDIS_REST_TOKEN: "redis-test-token"
+        },
         fetcher: fetcher as unknown as typeof fetch,
         now: () => new Date("2026-07-28T02:00:00.000Z"),
         randomId: () => "ai_test"
