@@ -10,6 +10,7 @@ export interface GenerateEnvironment {
   OPENAI_API_KEY?: string;
   OPENAI_MODEL?: string;
   FREE_REQUESTS_PER_HOUR?: string;
+  VERCEL_FIREWALL_RATE_LIMIT?: string;
   UPSTASH_REDIS_REST_URL?: string;
   UPSTASH_REDIS_REST_TOKEN?: string;
 }
@@ -109,7 +110,7 @@ export const generatePromptResponse = async ({ body, headers, deps }: GenerateAr
     };
   }
 
-  if (!deps.env.OPENAI_API_KEY || !hasDurableRateLimit(deps.env)) {
+  if (!deps.env.OPENAI_API_KEY || !hasPaidModelCostGuard(deps.env)) {
     const result = createLocalPrompt({ request, seed: `${key}:${request.idea}`, now: deps.now?.() ?? new Date() });
     return { ok: true, result, remaining: rate.remaining };
   }
@@ -298,7 +299,8 @@ const checkRateLimit = async (
   return { allowed: true, remaining: Math.max(0, limit - existing.count) };
 };
 
-const hasDurableRateLimit = (env: GenerateEnvironment): boolean =>
+export const hasPaidModelCostGuard = (env: GenerateEnvironment): boolean =>
+  env.VERCEL_FIREWALL_RATE_LIMIT?.toLowerCase() === "true" ||
   Boolean(env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN);
 
 const checkUpstashRateLimit = async (

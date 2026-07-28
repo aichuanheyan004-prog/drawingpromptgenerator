@@ -52,7 +52,7 @@ V1 does not take payment and does not require login. The reason is not "zero cos
 - Output capped by API token limit.
 - Low-cost model configured by `OPENAI_MODEL`, defaulting to `gpt-5.6-luna` unless the deployment owner overrides it.
 - Anonymous IP/session rate limit.
-- Durable Upstash Redis limiting is required before the server calls OpenAI; without it the API fails closed to the local generator.
+- A durable Vercel Firewall rate-limit rule or complete Upstash Redis credentials are required before the server calls OpenAI; without one of these cost guards the API fails closed to the local generator.
 - A verified OpenAI project budget/usage cap must be set before public AI launch. Treat provider-side limits as a final backstop, not the primary abuse control.
 - No image generation, uploads, database, or saved server history.
 
@@ -60,7 +60,7 @@ V1 does not take payment and does not require login. The reason is not "zero cos
 
 OpenAI's official standard pricing lists `gpt-5.6-luna` at `$1.00` per million input tokens and `$6.00` per million output tokens for short-context requests. With this endpoint's 900-output-token ceiling, a conservative request using 800 input tokens and the full 900 output tokens costs about `$0.0062`; a more typical 800-input/400-output request costs about `$0.0032`. At the conservative ceiling, 1,000 successful AI prompts are about `$6.20`, excluding taxes and regional-processing uplifts.
 
-Launch boundary: start with 12 successful AI requests per durable anonymous key per hour and an owner-selected monthly provider budget no higher than the amount the owner is comfortable losing in an abuse spike. Pause paid AI automatically by removing the Vercel key or Redis credentials if daily usage is abnormal, the budget reaches 80%, or durable limiting is unavailable. Do not rely on Vercel function memory for public cost control.
+Launch boundary: the production Vercel Firewall uses a fixed window of 2 requests per 600 seconds, keyed by IP, on `/api/generate/`. The application also retains its secondary anonymous session/IP limiter. Use an owner-selected monthly provider budget no higher than the amount the owner is comfortable losing in an abuse spike. Pause paid AI by removing `OPENAI_API_KEY` or disabling `VERCEL_FIREWALL_RATE_LIMIT` if daily usage is abnormal, the budget reaches 80%, or durable limiting is unavailable. Do not rely on Vercel function memory for public cost control.
 
 Payment is postponed until measured usage shows one of these triggers:
 
@@ -83,7 +83,7 @@ Controls:
 - No account, cookies, analytics, or database in v1.
 - Favorites and recent history are localStorage-only.
 - API requests are transient; users are told not to enter personal or sensitive information.
-- Durable server-side limits reduce cost exposure. Provider budget alerts/limits and Redis credentials are launch checklist items.
+- Durable edge limits reduce cost exposure. Provider budget alerts/limits and the verified Vercel Firewall rule are launch checklist items; Upstash remains an optional alternative.
 
 ## MVP Acceptance Criteria
 

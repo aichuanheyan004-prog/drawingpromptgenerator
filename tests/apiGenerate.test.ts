@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { extractOutputText, generatePromptResponse, parseRequest } from "../src/api/generatePrompt";
+import { extractOutputText, generatePromptResponse, hasPaidModelCostGuard, parseRequest } from "../src/api/generatePrompt";
 import { defaultControls, type GeneratePromptRequest } from "../src/lib/types";
 
 const baseRequest: GeneratePromptRequest = {
@@ -69,6 +69,18 @@ describe("API request validation", () => {
     if (result.ok) {
       expect(result.result.source).toBe("local");
     }
+  });
+
+  it("recognizes Vercel Firewall or complete Upstash credentials as paid-model cost guards", () => {
+    expect(hasPaidModelCostGuard({ VERCEL_FIREWALL_RATE_LIMIT: "true" })).toBe(true);
+    expect(
+      hasPaidModelCostGuard({
+        UPSTASH_REDIS_REST_URL: "https://redis.example",
+        UPSTASH_REDIS_REST_TOKEN: "token"
+      })
+    ).toBe(true);
+    expect(hasPaidModelCostGuard({ VERCEL_FIREWALL_RATE_LIMIT: "false" })).toBe(false);
+    expect(hasPaidModelCostGuard({ UPSTASH_REDIS_REST_URL: "https://redis.example" })).toBe(false);
   });
 
   it("enforces anonymous hourly limits", async () => {
