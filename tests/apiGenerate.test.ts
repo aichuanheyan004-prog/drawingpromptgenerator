@@ -202,7 +202,7 @@ describe("OpenAI response integration", () => {
             practiceSteps: [
               "Block the focal point.",
               "Add the shy pose. Wait malformed? Need fix.",
-              "Add the palette."
+              "Add the palette. \u041d?"
             ],
             aiImagePrompt: "original moon mechanic, graphite",
             negativePrompt: "no logos",
@@ -232,6 +232,7 @@ describe("OpenAI response integration", () => {
       expect(response.result.practiceSteps).toContain(
         "Review the silhouette, focal point, and chosen constraint before adding final details."
       );
+      expect(response.result.practiceSteps).toContain("Add the palette.");
     }
   });
 });
