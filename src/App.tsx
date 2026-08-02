@@ -36,6 +36,9 @@ function Header({ currentPath }: { currentPath: string }) {
         <a href="/guide/" aria-current={currentPath === "/guide/" ? "page" : undefined}>
           Guide
         </a>
+        <a href="/blog/" aria-current={currentPath === "/blog/" ? "page" : undefined}>
+          Blog
+        </a>
         <a href="/privacy/" aria-current={currentPath === "/privacy/" ? "page" : undefined}>
           Privacy
         </a>
@@ -50,6 +53,7 @@ function Footer() {
       <p>Original drawing prompts, AI text refinement, and local browser saves.</p>
       <nav aria-label="Footer navigation">
         <a href="/guide/">Guide</a>
+        <a href="/blog/">Blog</a>
         <a href="/privacy/">Privacy</a>
         <a href="/terms/">Terms</a>
       </nav>
