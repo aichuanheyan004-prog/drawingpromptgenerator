@@ -13,7 +13,9 @@
     "test:unit": "vitest run --root . --config vitest.config.mjs tests/promptGenerator.test.ts tests/apiGenerate.test.ts tests/storage.test.ts",
     "test:integration": "vitest run --root . --config vitest.config.mjs tests/app.integration.test.tsx",
     "test:e2e": "node tests/e2e-routes.mjs",
-    "audit:static": "node C:/Users/chunk/.codex/skills/gefei-site-builder/scripts/audit_static_site.mjs dist"
+    "audit:static": "node C:/Users/chunk/.codex/skills/gefei-site-builder/scripts/audit_static_site.mjs dist",
+    "indexnow": "node scripts/submit-indexnow.mjs",
+    "indexnow:live": "node scripts/submit-indexnow.mjs --live"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
